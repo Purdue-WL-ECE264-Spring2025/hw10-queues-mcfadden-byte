@@ -1,7 +1,6 @@
 #include "queue.h"
 #include "tile_game.h"
 
-//void print_q(struct queue *);
 
 void enqueue(struct queue *q, struct game_state state) {
 	insert_at_head(&(q -> data), serialize(state));
@@ -12,23 +11,6 @@ struct game_state dequeue(struct queue *q) {
 
 	return result;
 }
-
-/*void print_q(struct queue * q){
-	struct list_node * curr = (q -> data).head;
-	printf("QUE START:\n");
-	do{
-		struct game_state state = deserialize(curr -> value);
-		for (int i = 0; i < 4; i++){
-			for (int j = 0; j < 4; j++){
-				printf("%d ", state.tiles[i][j]);
-			}
-			printf("\n");
-		}
-		printf("\n");
-		curr = curr -> next;
-	}while (curr != NULL);
-}*/
-
 
 int number_of_moves(struct game_state start) {
 	
@@ -41,9 +23,6 @@ int number_of_moves(struct game_state start) {
 	struct queue que;
 	struct queue * q = &que;
 	(q -> data).head = NULL;
-	//struct list_node * first = malloc(sizeof(struct list_node));
-	//first -> value = serialize(start); first -> next = NULL;
-	//(q -> data).head = first;
 	enqueue(q, start);
 	int found = 0;
 	int num_steps = 0;
@@ -83,9 +62,6 @@ int number_of_moves(struct game_state start) {
 				if (udlr[i].num_steps == temp.num_steps + 1){
 					enqueue(q, udlr[i]);
 				}
-				/*if (udlr[i].num_steps == 1){
-					printf("NUM_STEPS = 1 HAS BEEN ADDED TO QUE! MOVE WAS: %d\n", i);
-				}*/
 			}
 			que_length += 4;
 		}else{
