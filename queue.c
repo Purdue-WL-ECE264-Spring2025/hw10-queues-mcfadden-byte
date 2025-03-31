@@ -15,43 +15,55 @@ struct game_state dequeue(struct queue *q) {
 
 int number_of_moves(struct game_state start) {
 	
+	//look at the first thing in queue; if correct, return its num_moves
+	//
+	//If not correct, create four temp copies, execute different move on each, place each in back of queue
+	//Advance to next item in queue
 
-	/*struct game_state up = start;	
-	struct game_state down = start;
-	struct game_state left = start;
-	struct game_state right = start;
+	//Set up the first thing in queue, which is the input grid
+	struct queue que;
+	struct queue * q = &que;
+	struct list_node first; first.value = serialize(start); first.next = NULL;
+	(q -> data).head = &first;
+	int found = 0;
+	int num_steps = 0;
 
-	move_up(&up);
-	move_down(&down);
-	move_left(&left);
-	move_right(&right);*/
+	
+	while (found == 0){
+		struct game_state temp = dequeue(q);
+		//printf("NUM STEPS: %d\n", temp.num_steps);
 
-	struct game_state udlr[4] = {start, start, start, start};
-	move_up(udlr);
-	move_down(udlr+1);
-	move_left(udlr+2);
-	move_right(udlr+3);
-
-	//check if any are correct
-	//if not, call self on each new one
-	int counter = 1;
-	int is_correct = 1;
-	for (int i = 0; i < 4; i++){
-		is_correct = 1;
-		for (int j = 0; j < 4; j++){
-			for (int k = 0; k < 4; k++){
-				if (udlr[i].tiles[j][k] != counter && counter != 16){
-					is_correct = 0;
+		//Check if first thing in queue is correct
+		int equal = 1;
+		int counter = 1;
+		for (int i = 0; i < 4; i++){
+			for (int j = 0; j < 4; j++){
+				if (temp.tiles[i][j] != counter && counter != 16){
+					equal = 0;
 					break;
 				}
 				counter++;
 			}
 		}
-		if (is_correct != 0){
-			return udlr[i].num_steps;
+
+		//If first thing in queue is not correct, create four copies, one for each move, and add them to the back of queue
+		if (equal == 0){
+			struct game_state udlr[4] = {temp, temp, temp, temp};
+			move_up(udlr);
+			move_down(udlr+1);
+			move_left(udlr+2);
+			move_right(udlr+3);
+
+			for (int i = 0; i < 4; i++){
+				enqueue(q, udlr[i]);
+			}
+		}else{
+			//If first thing in queue is correct, record the number of steps
+			found = 1;
+			num_steps = temp.num_steps;
 		}
 
 	}
 
-	return 0;
+	return num_steps;
 }

@@ -15,17 +15,20 @@ void insert_at_head(struct linked_list *list, size_t value) {
 }
 
 void insert_at_tail(struct linked_list *list, size_t value) {
-	while (list -> head -> next != NULL){
-		list -> head = list -> head -> next;
+	if (list -> head == NULL){
+		list -> head = new_node(value);
+	}else{
+		struct list_node * last = list -> head;
+		while (last -> next != NULL){
+			last = last -> next;
+		}
+		last -> next = new_node(value);
 	}
-	list -> head -> next = new_node(value);
 }
 
 size_t remove_from_head(struct linked_list *list) {
 	size_t result = list -> head -> value;
-	struct list_node * temp = list -> head;
 	list -> head = list -> head -> next;
-	free(temp);
 	return result;
 }
 
