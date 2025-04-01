@@ -64,16 +64,14 @@ int number_of_moves(struct game_state start) {
 				struct game_state seen_copy = udlr[i];
 				seen_copy.num_steps = 0;
 				//Check if already encountered
-				int copy = 1;
-				if (udlr[i].num_steps == temp.num_steps + 1){
-					copy = 0;
-				}
-				
+				int copy = 0;
 				//For everything in the queue...
 				struct list_node * curr = (sb -> data).head;
+				size_t sc_ser = serialize(seen_copy);
+
 				while (curr -> next != NULL && copy == 0){
 					//Check if seen before
-					if (serialize(seen_copy) == curr -> value){
+					if (sc_ser == curr -> value){
 						copy = 1;
 					}
 					curr = curr -> next;
