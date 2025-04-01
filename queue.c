@@ -31,6 +31,12 @@ int number_of_moves(struct game_state start) {
 	//int index = 0;
 	int goal[4][4] = {{1,2,3,4},{5,6,7,8},{9,10,11,12},{13,14,15,0}};
 
+	struct queue seen_before;
+	struct queue * sb = &seen_before;
+	(sb -> data).head = NULL;
+	start.num_steps = 0;
+	enqueue(sb, start);
+
 	
 	while (found == 0){
 		struct game_state temp = dequeue(q);
@@ -42,11 +48,6 @@ int number_of_moves(struct game_state start) {
 
 		//Check if first thing in queue is correct
 		int equal = 1;
-		/*if (memcmp(temp.tiles, goal, sizeof(goal)) == 0){
-			found = 1;
-			num_steps = temp.num_steps;
-			break;
-		}*/
 		for (int i = 0; i < 4 && equal == 1; i++){
 			for (int j = 0; j < 4 && equal == 1; j++){
 				//printf("%02d ", temp.tiles[i][j]);
@@ -61,22 +62,38 @@ int number_of_moves(struct game_state start) {
 		//If first thing in queue is not correct, create four copies, one for each move, and add them to the back of queue
 		if (equal == 0){
 			struct game_state udlr[4] = {temp, temp, temp, temp};
+			/*if (temp.empty_row != 3){
+				move_down(udlr+1);
+			}
+			if (temp.empty_row != 0){
+				move_up(udlr);
+			}
+			if (temp.empty_col != 3){
+				move_right(udlr+3);
+			}
+			if (temp.empty_col != 0){
+				move_left(udlr+2);
+			}*/
+			
 			move_up(udlr);
 			move_down(udlr+1);
 			move_left(udlr+2);
 			move_right(udlr+3);
-			
+
 			//printf("NUM ENQUEUED: ");
 			for (int i = 0; i < 4; i++){
+				struct game_state seen_copy = udlr[i];
+				seen_copy.num_steps = 0;
 				//Check if already encountered
 				int copy = 1;
 				if (udlr[i].num_steps == temp.num_steps + 1){
 					copy = 0;
 				}
 				//For everything in the queue...
-				if ((q->data).head != NULL){
-					struct list_node * curr = (q->data).head;
+				//if ((q->data).head != NULL){
+					struct list_node * curr = (sb -> data).head;
 					while (curr -> next != NULL && copy == 0){
+						/*
 						//Check if equal to compare
 						int copy_of_compare = 1;
 						struct game_state compare = deserialize(curr -> value);
@@ -89,15 +106,19 @@ int number_of_moves(struct game_state start) {
 						}
 						if (copy_of_compare == 1){
 							copy = 1;
+						}*/
+						if (serialize(seen_copy) == curr -> value){
+							copy = 1;
 						}
+
 						curr = curr -> next;
 					}
-				}
-
+				//}
 
 				if (udlr[i].num_steps == temp.num_steps + 1 && copy == 0){
 					enqueue(q, udlr[i]);
 					que_length++;
+					enqueue(sb, seen_copy);
 				}
 			}
 			//printf("\n");
@@ -110,6 +131,7 @@ int number_of_moves(struct game_state start) {
 	}
 
 	free_list(q -> data);
+	free_list(sb -> data);
 
 	return num_steps;
 }
